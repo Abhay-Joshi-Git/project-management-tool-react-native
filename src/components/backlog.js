@@ -56,7 +56,7 @@ class Backlog extends React.Component {
                 renderScrollComponent={props => <InfiniteScrollView {...props} />}
                 dataSource={this.state.dataSource}
                 renderRow={this._renderRow}
-                enableEmptySections={true}                
+                enableEmptySections={true}
                 canLoadMore={true}
                 onLoadMoreAsync={this._loadMoreContentAsync.bind(this)}
             />
@@ -73,7 +73,7 @@ class Backlog extends React.Component {
 
     _renderRow(issue) {
         return (
-            <View key={issue.get('id')} style={styles.issueCotainer}>
+            <View key={issue.get('id')} style={styles.listItemCotainer}>
                 <Text>
                     id: {issue.get('id')}
                 </Text>
