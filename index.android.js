@@ -1,10 +1,7 @@
 import React from 'react';
 import {
-    AppRegistry,
-    View,
-    Text
+    AppRegistry
 } from 'react-native';
-
 import App from './src/app.js';
 
 AppRegistry.registerComponent('projectManagementTool', () => App);

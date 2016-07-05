@@ -32,19 +32,3 @@ export default class App extends React.Component {
         );
     }
 }
-
-
-
-// export default class App extends React.Component {
-//     render() {
-//         return (
-//             <View>
-//                 <Text>
-//                     This is just to test from separate file
-//                 </Text>
-//             </View>
-//         )
-//     }
-// }
-//
-//

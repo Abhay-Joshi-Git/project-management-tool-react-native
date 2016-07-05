@@ -10,6 +10,7 @@
     "project-management-tool-redux": "git://github.com/Abhay-Joshi-Git/project-management-tool-redux.git#master",
     "react": "15.1.0",
     "react-native": "^0.28.0",
+    "react-native-dropdown": "0.0.6",
     "react-native-infinite-scroll-view": "git://github.com/Abhay-Joshi-Git/react-native-infinite-scroll-view.git#master",
     "react-redux": "^4.4.5"
   },
