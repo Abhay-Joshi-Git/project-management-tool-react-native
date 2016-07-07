@@ -6,7 +6,7 @@ import {
 import immutable from 'immutable';
 import PMTstore, {modules} from 'project-management-tool-redux';
 import { connect } from 'react-redux';
-var imgsrc;
+import Backlog from 'backlog.js';
 
 
 class SetImage extends React.Component{
@@ -23,6 +23,7 @@ class SetImage extends React.Component{
       })
   }
   render(){
+    var imgsrc;
     return(
       <View>
         <View>

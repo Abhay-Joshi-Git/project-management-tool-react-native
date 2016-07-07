@@ -12,13 +12,19 @@ import { connect } from 'react-redux';
 import InfiniteScrollView from 'react-native-infinite-scroll-view';
 import listStyle from './commonStyles/list.js';
 import immutable from 'immutable';
-import { imgsrc } from '/home/synerzip/project-management-tool-react-native/src/components/setimagesource.js';
 var styles = StyleSheet.create(listStyle);
+var type_story=require('../../images/story.jpg');
+var prio_highest=require('../../images/highest.jpg');
+var prio_high=require('../../images/high.jpg');
+var prio_med=require('../../images/medium.jpg');
+var prio_low=require('../../images/lowest.jpg');
+var type_bug=require('../../images/bug.jpg');
 
 class Backlog extends React.Component {
-
     constructor(props) {
         super();
+        this._setIssueType=this._setIssueType.bind(this);
+        this._setPriority=this._setPriority.bind(this);
 
         var ds = new ListView.DataSource({
             rowHasChanged: (r1, r2) => r1 !== r2
@@ -42,57 +48,33 @@ class Backlog extends React.Component {
     render() {
         return (
             <View style={styles.container}>
-            <View style={{  flexDirection:'row',alignItems:'center'}}>
-                  <Text style={styles.headerText}>Sprints</Text>
-                  <TouchableOpacity>
-                  <Image style={styles.icon}
-                      source={require('/home/synerzip/project-management-tool-react-native/images/CarrotDownArrowCurved_backgroundUpdated.png')}
-                  />
-                  </TouchableOpacity>
-                  </View>
+                <View style={styles.sprintContainer}>
+                      <View style={styles.sprintLeft}>
+                          <Text style={styles.headerText}>Sprint</Text>
+                      </View>
+                      <View style={styles.sprintRight}>
+                          <TouchableOpacity>
+                          <Image style={styles.icon}
+                              source={require('../../images/CarrotDownArrowCurved_backgroundUpdated_white.png')}
+                          />
+                          </TouchableOpacity>
+                      </View>
+                </View>
+                  <View style={styles.separator}/>
                   <Text style={styles.headerText}>Backlog</Text>
+                  <View style={styles.separator}/>
                   <View style={styles.listViewContainer}>
                       {this._getIssuesList()}
                   </View>
             </View>
         );
     }
-// sprintPress(){
-//       return(
-//         <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-//           <Select
-//             width={250}
-//             ref="sel"
-//             optionListRef={() => this.ref['olist']}>
-//             {
-//               sprintlist.map((item) => <Option>{item.sprint_name}</Option>)
-//             }
-//           </Select>
-//           <OptionList ref="olist"/>
-//         </View>
-//       )
-// }
-getSprintList(){
-  return (
-      <ListView
-          renderScrollComponent={props => <InfiniteScrollView {...props} />}
-          dataSource={this.state.dataSource1}
-          renderRow={this._renderRow1}
-          enableEmptySections={true}
-          canLoadMore={true}
-          onLoadMoreAsync={this._loadMoreContentAsync.bind(this)}
-      />
-  )
-}
-_renderRow1(Sprints){
-
-}
     _getIssuesList() {
         return (
             <ListView
                 renderScrollComponent={props => <InfiniteScrollView {...props} />}
                 dataSource={this.state.dataSource}
-                renderRow={this._renderRow}
+                renderRow={this._renderRow.bind(this)}
                 enableEmptySections={true}
                 canLoadMore={true}
                 onLoadMoreAsync={this._loadMoreContentAsync.bind(this)}
@@ -106,39 +88,57 @@ _renderRow1(Sprints){
         })
         return Promise.resolve(true)
     }
-    // setImageSource(){
-    //   if(issue.get('priority') === 'high'){
-    //     imgsrc=require('../../images/clearSelection_1.jpg');
-    //   }
-    //   else {
-    //     imgsrc=require('../../images/issueImage.png');
-    //   }
-    //   return imgsrc
-    // }
-
+    _setIssueType(issue){
+        switch (issue.get('type')) {
+          case 'story':return (<Image style={styles.icon} source={type_story}/>)
+          break;
+          case 'bug':return (<Image style={styles.icon} source={type_bug}/>)
+          break;
+            }
+    }
+    _setPriority(issue){
+          switch (issue.get('priority')) {
+            case 'highest':return (<Image style={styles.icon} source={prio_highest}/>)
+              break;
+            case 'high':return (<Image style={styles.icon} source={prio_high}/>)
+                break;
+            case 'medium':return (<Image style={styles.icon} source={prio_med}/>)
+                  break;
+            case 'low':return (<Image style={styles.icon} source={prio_low}/>)
+                    break;
+            }
+        }
     _renderRow(issue) {
         return (
-            <View key={issue.get('id')} style={styles.listItemCotainer}>
-                <View style={styles.view1}>
-                      <Image style={styles.icon}
-                      source={require('/home/synerzip/project-management-tool-react-native/images/clearSelection_1.jpg')}/>
-                      <Image style={styles.icon}
-                      source={imgsrc}/>
-                      <View style={styles.roundball}>
-                                <Text>{issue.get('estimation')}</Text>
-                        </View>
-                      <Text style={{fontSize:15}}>
-                          {issue.get('id')}
+          <View key={issue.get('id')} style={styles.listItemCotainer}>
+                  <View style={styles.leftContainer}>
+                      <View style={styles.topContainer}>
+                          <View style={styles.topLeft}>
+                              {this._setIssueType(issue)}
+                              {this._setPriority(issue)}
+                              <Text style={{fontSize:20,color:'#095eef',fontWeight: 'bold',marginLeft:2}}>
+                              {issue.get('id')}
+                              </Text>
+                          </View>
+                          <View style={styles.topRight}>
+                          <View style={styles.roundball}>
+                                      <Text style={{fontWeight: 'bold'}}>{issue.get('estimation')}</Text>
+                          </View>
+                          </View>
+                      </View>
+                      <View style={styles.bottomContainer}>
+                      <Text numberOfLines={2} style={styles.summaryText}>
+                            {issue.get('summary')}
                       </Text>
-                </View>
-                <View style={styles.view2}>
-                      <Text numberOfLines={1}
-                            style={{justifyContent:'flex-end',fontSize:15}}>
-                          {issue.get('summary')}
-                      </Text>
-                </View>
+                      </View>
+                  </View>
+                  <View style={styles.rightContainer}>
+                  <Image style={styles.icon}
+                      source={require('../../images/CarrotDownArrowCurved_backgroundUpdated_white.png')}
+                  />
+                  </View>
             </View>
-        )
+          )
     }
 }
 

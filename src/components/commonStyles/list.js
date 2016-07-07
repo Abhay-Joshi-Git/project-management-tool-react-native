@@ -3,50 +3,75 @@ import common from './common.js';
 export default {
     ...common,
     listViewContainer: {
-        flex: 1
-    },
-    // listItemCotainer: {
-    //     backgroundColor: 'rgb(240, 240, 240)',
-    //     alignItems: 'flex-start',
-    //     flex: 1,
-    //     marginBottom: 2,
-    //     paddingLeft: 5,
-    //     height:60,
-    // },
+        flex: 1,
+      },
     listItemCotainer:{
-      height:60,
-      borderBottomWidth:1,
-      borderBottomColor: 'black',
-    flex:1,
-    },
-    view1:{
-  justifyContent: 'flex-start' ,
-  alignItems: 'flex-start',
+  height:75,
+  borderBottomWidth:1,
+  borderBottomColor: 'black',
+  flex:1,
   flexDirection:'row',
 },
-  view2:{
-  flex:1,
-  justifyContent: 'center' ,
-
-},
-  icon:{
+icon:{
       height:25,
       width:25,
-      marginRight:20,
     },
-    roundball:{
-    width: 30,
-    height: 25,
-    borderRadius:10,
-    backgroundColor: 'gray',
+roundball:{
+    width: 37,
+    height: 30,
+    borderRadius:37,
+    backgroundColor: '#eaeded',
     alignItems:'center',
-    justifyContent:'center',
-    marginRight:20,
+     justifyContent:'center',
   },
-    heading: {
-      fontSize: 20,
-      margin: 10,
-      color: 'black',
-      fontWeight: 'bold',
+leftContainer:{
+  flex:.90,
+  flexDirection:'column',
+},
+topContainer:{
+  flex:1,
+  flexDirection:'row',
+
+},
+topLeft:{
+  flex:3,
+  flexDirection:'row',
+  alignItems:'center',
+  justifyContent:'flex-start',
+},
+topRight:{
+  flex:1,
+  alignItems:'center',
+   justifyContent:'flex-end',
+},
+bottomContainer:{
+  flex:1,
+  },
+rightContainer:{
+  flex:.10,
+  alignItems:'flex-start',
+   justifyContent:'center',
+},
+separator: {
+      height:1,
+      backgroundColor: 'black',
+    },
+    sprintContainer:{
+      flexDirection:'row',
+    },
+    sprintLeft:{
+      flex:.90,
+      alignItems:'flex-start',
+    },
+    sprintRight:{
+      flex:.10,
+      alignItems:'flex-start',
+       justifyContent:'center',
+    },
+    summaryText:{
+      justifyContent:'flex-end',
+      fontSize:15,
+      marginLeft:5,
+      color:'black',
     },
 }
