@@ -5,7 +5,6 @@ import {
     Text
 } from 'react-native';
 import Backlog from './components/backlog.js';
-
 import { Provider } from 'react-redux';
 import PMTstore from 'project-management-tool-redux';
 
@@ -18,7 +17,6 @@ export default class App extends React.Component {
         var Component = routes[route.name];
         return <Component route={route} navigator={navigator} />;
     }
-
     render() {
         return (
             <Provider store={PMTstore}>
