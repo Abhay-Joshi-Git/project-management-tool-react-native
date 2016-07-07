@@ -16,7 +16,7 @@ icon:{
       height:25,
       width:25,
     },
-roundball:{
+ellipse:{
     width: 37,
     height: 30,
     borderRadius:37,

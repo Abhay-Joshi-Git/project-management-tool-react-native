@@ -121,7 +121,7 @@ class Backlog extends React.Component {
                               </Text>
                           </View>
                           <View style={styles.topRight}>
-                          <View style={styles.roundball}>
+                          <View style={styles.ellipse}>
                                       <Text style={{fontWeight: 'bold'}}>{issue.get('estimation')}</Text>
                           </View>
                           </View>
