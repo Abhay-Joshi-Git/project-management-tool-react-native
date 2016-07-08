@@ -1,11 +1,13 @@
 export default {
     container: {
         flex: 1,
-        alignItems: 'center',
-        backgroundColor: '#FFFFFF',
+        backgroundColor: 'white',
+
     },
     headerText: {
         fontSize: 30,
-        marginBottom: 5
+        fontWeight:"400",
+        color:'black',
+        marginLeft:40,
     }
 }
