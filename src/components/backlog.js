@@ -3,36 +3,25 @@ import {
   StyleSheet,
   Text,
   View,
-  ListView,
   Image,
   TouchableOpacity,
 } from 'react-native';
 import immutable from 'immutable';
 import PMTstore, {modules} from 'project-management-tool-redux';
 import { connect } from 'react-redux';
-import InfiniteScrollView from 'react-native-infinite-scroll-view';
+import MultiSelectDragDropListView from './multiSelectDragDropList.js';
 import Issue from './issue.js';
 import listStyle from './commonStyles/list.js';
 import { IMG_DOWN_CARET } from '../images.js';
+import appConst from '../constants.js';
 
 class Backlog extends React.Component {
     constructor(props) {
         super();
         this._bindFunctions();
-        var ds = new ListView.DataSource({
-            rowHasChanged: (r1, r2) => r1 !== r2
-        })
-        this.state = {
-            dataSource: ds.cloneWithRows(props.issues.toArray())
-        }
     }
     _bindFunctions() {
         this._loadMoreContentAsync = this._loadMoreContentAsync.bind(this);
-    }
-    componentWillReceiveProps(nextProps) {
-        this.setState({
-            dataSource: this.state.dataSource.cloneWithRows(nextProps.issues.toArray())
-        })
     }
     componentDidMount() {
         this._loadMoreContentAsync();
@@ -77,12 +66,9 @@ class Backlog extends React.Component {
     }
     getListViewUI() {
         return (
-            <ListView
-                renderScrollComponent={props => <InfiniteScrollView {...props} />}
-                dataSource={this.state.dataSource}
+            <MultiSelectDragDropListView
+                data={this.props.issues.toArray()}
                 renderRow={this._renderRow}
-                enableEmptySections={true}
-                canLoadMore={true}
                 onLoadMoreAsync={this._loadMoreContentAsync}
             />
         )
@@ -90,7 +76,7 @@ class Backlog extends React.Component {
     _loadMoreContentAsync() {
         this.props.loadIssues({
             offset: this.props.issues.count(),
-            qty: 16
+            qty: appConst.LOAD_BATCH_QTY
         })
         return Promise.resolve(true)
     }
