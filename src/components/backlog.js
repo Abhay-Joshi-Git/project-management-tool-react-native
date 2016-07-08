@@ -13,12 +13,12 @@ import InfiniteScrollView from 'react-native-infinite-scroll-view';
 import listStyle from './commonStyles/list.js';
 import immutable from 'immutable';
 import {
-    IMG_SRC_ISSUE_TYPE_STORY,
-    IMG_SRC_ISSUE_TYPE_BUG,
-    IMG_SRC_PRIO_HIGHEST,
-    IMG_SRC_PRIO_HIGH,
-    IMG_SRC_PRIO_MED,
-    IMG_SRC_PRIO_LOW,
+    IMG_ISSUE_TYPE_STORY,
+    IMG_ISSUE_TYPE_BUG,
+    IMG_PRIO_HIGHEST,
+    IMG_PRIO_HIGH,
+    IMG_PRIO_MED,
+    IMG_PRIO_LOW,
     IMG_DOWN_CARET
 } from '../images.js';
 
@@ -54,7 +54,7 @@ class Backlog extends React.Component {
             <View style={styles.container}>
                 {this._getSprintContainerUI()}
                 <View style={styles.separator}/>
-                <Text style={styles.headerText}>Backlog</Text>
+                {this._getBacklogHeaderUI()}
                 <View style={styles.separator}/>
                 <View style={styles.listViewContainer}>
                     {this._getIssuesList()}
@@ -64,16 +64,25 @@ class Backlog extends React.Component {
     }
     _getSprintContainerUI() {
         return (
-            <View style={styles.sprintContainer}>
+            <View style={styles.headerContainer}>
                   <View style={styles.sprintLeft}>
                       <Text style={styles.headerText}>Sprint</Text>
                   </View>
                   <View style={styles.sprintRight}>
                       <TouchableOpacity>
-                      <Image style={styles.icon}
-                          source={IMG_DOWN_CARET}
-                      />
+                          <Image style={styles.icon}
+                              source={IMG_DOWN_CARET}
+                          />
                       </TouchableOpacity>
+                  </View>
+            </View>
+        )
+    }
+    _getBacklogHeaderUI() {
+        return (
+            <View style={styles.headerContainer}>
+                  <View style={styles.sprintLeft}>
+                      <Text style={styles.headerText}>Backlog</Text>
                   </View>
             </View>
         )
@@ -100,21 +109,21 @@ class Backlog extends React.Component {
     _getIssueTypeUI(issue){
         switch (issue.get('type')) {
             case 'story':
-                return (<Image style={styles.icon} source={IMG_SRC_ISSUE_TYPE_STORY}/>)
+                return (<Image style={styles.icon} source={IMG_ISSUE_TYPE_STORY}/>)
             case 'bug':
-                return (<Image style={styles.icon} source={IMG_SRC_ISSUE_TYPE_BUG}/>)
+                return (<Image style={styles.icon} source={IMG_ISSUE_TYPE_BUG}/>)
         }
     }
     _getPriorityUI(issue){
         switch (issue.get('priority')) {
             case 'highest':
-                return (<Image style={styles.icon} source={IMG_SRC_PRIO_HIGHEST}/>)
+                return (<Image style={styles.icon} source={IMG_PRIO_HIGHEST}/>)
             case 'high':
-                return (<Image style={styles.icon} source={IMG_SRC_PRIO_HIGH}/>)
+                return (<Image style={styles.icon} source={IMG_PRIO_HIGH}/>)
             case 'medium':
-                return (<Image style={styles.icon} source={IMG_SRC_PRIO_MED}/>)
+                return (<Image style={styles.icon} source={IMG_PRIO_MED}/>)
             case 'low':
-                return (<Image style={styles.icon} source={IMG_SRC_PRIO_LOW}/>)
+                return (<Image style={styles.icon} source={IMG_PRIO_LOW}/>)
         }
     }
     _renderRow(issue) {
@@ -142,9 +151,11 @@ class Backlog extends React.Component {
                       </View>
                   </View>
                   <View style={styles.rightContainer}>
-                  <Image style={styles.icon}
-                      source={IMG_DOWN_CARET}
-                  />
+                      <TouchableOpacity>
+                          <Image style={styles.icon}
+                              source={IMG_DOWN_CARET}
+                          />
+                      </TouchableOpacity>
                   </View>
             </View>
           )
