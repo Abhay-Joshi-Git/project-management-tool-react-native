@@ -5,7 +5,7 @@ export default {
 
     },
     headerText: {
-        fontSize: 30,
+        fontSize: 24,
         fontWeight:"400",
         color:'black',
         marginLeft:40,

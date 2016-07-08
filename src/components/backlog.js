@@ -12,111 +12,120 @@ import { connect } from 'react-redux';
 import InfiniteScrollView from 'react-native-infinite-scroll-view';
 import listStyle from './commonStyles/list.js';
 import immutable from 'immutable';
-var styles = StyleSheet.create(listStyle);
-var type_story=require('../../images/story.jpg');
-var prio_highest=require('../../images/highest.jpg');
-var prio_high=require('../../images/high.jpg');
-var prio_med=require('../../images/medium.jpg');
-var prio_low=require('../../images/lowest.jpg');
-var type_bug=require('../../images/bug.jpg');
+import {
+    IMG_SRC_ISSUE_TYPE_STORY,
+    IMG_SRC_ISSUE_TYPE_BUG,
+    IMG_SRC_PRIO_HIGHEST,
+    IMG_SRC_PRIO_HIGH,
+    IMG_SRC_PRIO_MED,
+    IMG_SRC_PRIO_LOW,
+    IMG_DOWN_CARET
+} from '../images.js';
 
 class Backlog extends React.Component {
     constructor(props) {
         super();
-        this._setIssueType=this._setIssueType.bind(this);
-        this._setPriority=this._setPriority.bind(this);
+        this._bindFunctions();
 
         var ds = new ListView.DataSource({
             rowHasChanged: (r1, r2) => r1 !== r2
         })
 
         this.state = {
-            dataSource: ds.cloneWithRows(props.issues.toArray()),
-            issues: [...props.issues.toArray()],
+            dataSource: ds.cloneWithRows(props.issues.toArray())
         }
+    }
+    _bindFunctions() {
+        this._getIssueTypeUI = this._getIssueTypeUI.bind(this);
+        this._getPriorityUI = this._getPriorityUI.bind(this);
+        this._renderRow = this._renderRow.bind(this);
+        this._loadMoreContentAsync = this._loadMoreContentAsync.bind(this);
     }
     componentWillReceiveProps(nextProps) {
         this.setState({
-            dataSource: this.state.dataSource.cloneWithRows(nextProps.issues.toArray()),
-            issues: [...nextProps.issues.toArray()]
+            dataSource: this.state.dataSource.cloneWithRows(nextProps.issues.toArray())
         })
     }
-
     componentDidMount() {
         this._loadMoreContentAsync();
     }
     render() {
         return (
             <View style={styles.container}>
-                <View style={styles.sprintContainer}>
-                      <View style={styles.sprintLeft}>
-                          <Text style={styles.headerText}>Sprint</Text>
-                      </View>
-                      <View style={styles.sprintRight}>
-                          <TouchableOpacity>
-                          <Image style={styles.icon}
-                              source={require('../../images/CarrotDownArrowCurved_backgroundUpdated_white.png')}
-                          />
-                          </TouchableOpacity>
-                      </View>
+                {this._getSprintContainerUI()}
+                <View style={styles.separator}/>
+                <Text style={styles.headerText}>Backlog</Text>
+                <View style={styles.separator}/>
+                <View style={styles.listViewContainer}>
+                    {this._getIssuesList()}
                 </View>
-                  <View style={styles.separator}/>
-                  <Text style={styles.headerText}>Backlog</Text>
-                  <View style={styles.separator}/>
-                  <View style={styles.listViewContainer}>
-                      {this._getIssuesList()}
-                  </View>
             </View>
         );
+    }
+    _getSprintContainerUI() {
+        return (
+            <View style={styles.sprintContainer}>
+                  <View style={styles.sprintLeft}>
+                      <Text style={styles.headerText}>Sprint</Text>
+                  </View>
+                  <View style={styles.sprintRight}>
+                      <TouchableOpacity>
+                      <Image style={styles.icon}
+                          source={IMG_DOWN_CARET}
+                      />
+                      </TouchableOpacity>
+                  </View>
+            </View>
+        )
     }
     _getIssuesList() {
         return (
             <ListView
                 renderScrollComponent={props => <InfiniteScrollView {...props} />}
                 dataSource={this.state.dataSource}
-                renderRow={this._renderRow.bind(this)}
+                renderRow={this._renderRow}
                 enableEmptySections={true}
                 canLoadMore={true}
-                onLoadMoreAsync={this._loadMoreContentAsync.bind(this)}
+                onLoadMoreAsync={this._loadMoreContentAsync}
             />
         )
     }
     _loadMoreContentAsync() {
         this.props.loadIssues({
-            offset: this.state.issues.length,
+            offset: this.props.issues.count(),
             qty: 16
         })
         return Promise.resolve(true)
     }
-    _setIssueType(issue){
+    _getIssueTypeUI(issue){
         switch (issue.get('type')) {
-          case 'story':return (<Image style={styles.icon} source={type_story}/>)
-          break;
-          case 'bug':return (<Image style={styles.icon} source={type_bug}/>)
-          break;
-            }
-    }
-    _setPriority(issue){
-          switch (issue.get('priority')) {
-            case 'highest':return (<Image style={styles.icon} source={prio_highest}/>)
-              break;
-            case 'high':return (<Image style={styles.icon} source={prio_high}/>)
-                break;
-            case 'medium':return (<Image style={styles.icon} source={prio_med}/>)
-                  break;
-            case 'low':return (<Image style={styles.icon} source={prio_low}/>)
-                    break;
-            }
+            case 'story':
+                return (<Image style={styles.icon} source={IMG_SRC_ISSUE_TYPE_STORY}/>)
+            case 'bug':
+                return (<Image style={styles.icon} source={IMG_SRC_ISSUE_TYPE_BUG}/>)
         }
+    }
+    _getPriorityUI(issue){
+        switch (issue.get('priority')) {
+            case 'highest':
+                return (<Image style={styles.icon} source={IMG_SRC_PRIO_HIGHEST}/>)
+            case 'high':
+                return (<Image style={styles.icon} source={IMG_SRC_PRIO_HIGH}/>)
+            case 'medium':
+                return (<Image style={styles.icon} source={IMG_SRC_PRIO_MED}/>)
+            case 'low':
+                return (<Image style={styles.icon} source={IMG_SRC_PRIO_LOW}/>)
+        }
+    }
     _renderRow(issue) {
         return (
           <View key={issue.get('id')} style={styles.listItemCotainer}>
                   <View style={styles.leftContainer}>
                       <View style={styles.topContainer}>
                           <View style={styles.topLeft}>
-                              {this._setIssueType(issue)}
-                              {this._setPriority(issue)}
-                              <Text style={{fontSize:20,color:'#095eef',fontWeight: 'bold',marginLeft:2}}>
+                              {this._getIssueTypeUI(issue)}
+                              {this._getPriorityUI(issue)}
+                              <Text style={styles.issueId}>
                               {issue.get('id')}
                               </Text>
                           </View>
@@ -134,7 +143,7 @@ class Backlog extends React.Component {
                   </View>
                   <View style={styles.rightContainer}>
                   <Image style={styles.icon}
-                      source={require('../../images/CarrotDownArrowCurved_backgroundUpdated_white.png')}
+                      source={IMG_DOWN_CARET}
                   />
                   </View>
             </View>
@@ -152,3 +161,13 @@ export default connect(
     mapStateToProps,
     {loadIssues: modules.issues.loadIssues}
 )(Backlog);
+
+const styles = StyleSheet.create({
+    ...listStyle,
+    issueId: {
+        fontSize: 20,
+        color: '#095eef',
+        fontWeight: 'bold',
+        marginLeft: 2
+    }
+});
