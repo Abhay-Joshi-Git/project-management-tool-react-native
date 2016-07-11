@@ -7,11 +7,14 @@
   },
   "dependencies": {
     "immutable": "^3.8.1",
+    "lodash": "^4.13.1",
     "project-management-tool-redux": "git://github.com/Abhay-Joshi-Git/project-management-tool-redux.git#master",
     "react": "15.1.0",
+    "react-mixin": "^3.0.5",
     "react-native": "^0.28.0",
     "react-native-infinite-scroll-view": "git://github.com/Abhay-Joshi-Git/react-native-infinite-scroll-view.git#master",
-    "react-redux": "^4.4.5"
+    "react-redux": "^4.4.5",
+    "react-timer-mixin": "^0.13.3"
   },
   "devDependencies": {
     "babel-core": "^6.10.4",
