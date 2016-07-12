@@ -5,7 +5,7 @@ export default {
     listViewContainer: {
         flex: 1,
     },
-    listItemCotainer: {
+    listItemContainer: {
         height:75,
         borderBottomWidth:1,
         borderBottomColor: 'black',

@@ -33,9 +33,7 @@ class Backlog extends React.Component {
                 <View style={styles.separator}/>
                 {this._getBacklogHeaderUI()}
                 <View style={styles.separator}/>
-                <View style={styles.listViewContainer}>
-                    {this.getListViewUI()}
-                </View>
+                {this.getListViewUI()}                    
             </View>
         );
     }

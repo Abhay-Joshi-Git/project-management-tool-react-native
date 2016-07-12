@@ -17,11 +17,11 @@ import reactMixin from 'react-mixin';
 import timerMixin from 'react-timer-mixin';
 import _ from 'lodash';
 import listStyle from './commonStyles/list.js';
-
+import NativeMethodsMixin from 'NativeMethodsMixin';
 
 //should be called on render rather than caching the value, it may change e.g. due to rotation
 var Window = Dimensions.get('window');
-const ROW_HEIGHT = 60;
+const ROW_HEIGHT = listStyle.listItemContainer.height;
 const DROP_CONTAINER_HEIGHT = 40;
 const ROW_DROP_ENABLE_HEIGHT = ROW_HEIGHT / 2;
 const DRAGGABLE_HEIGHT_DEFAULT = 30;
@@ -67,6 +67,10 @@ export default class MultiSelectDragDropListView extends Component {
         this.moveStartOffset = 0;
         this.draagablePanStartRespond = false;
         this.draggablePanStartRespondTimeoutReference = null;
+        this.listContainerPositionRelToPage = {
+            x: 0,
+            y: 0
+        }
     }
     _responderCreate() {
         this._draggablePanResponderCreate();
@@ -207,10 +211,10 @@ export default class MultiSelectDragDropListView extends Component {
         ((gestureState.moveY - SCROLL_GUTTER) > 0)){
             options.pan.setValue({
                 x: 20,
-                y: gestureState.moveY
+                y: gestureState.moveY- this.listContainerPositionRelToPage.y
             });
         }
-        let dropIndex = Math.ceil((gestureState.moveY - ROW_DROP_ENABLE_HEIGHT + this.totalScrollOffset) / ROW_HEIGHT);
+        let dropIndex = Math.ceil((gestureState.moveY - this.listContainerPositionRelToPage.y - ROW_DROP_ENABLE_HEIGHT + this.totalScrollOffset) / ROW_HEIGHT);
         let prevDropRowContainer = _.find(this.state.updatedData, item => item.get('dropRowContainer'));
         var updatedData = null;
         if (!prevDropRowContainer) {
@@ -298,25 +302,38 @@ export default class MultiSelectDragDropListView extends Component {
             </View>
         )
     }
-//                    renderScrollComponent={props => <InfiniteScrollView {...props} />}
-/*
-enableEmptySections={true}
-canLoadMore={true}
-
-*/
     _getListView() {
         return (
+            <View style={styles.listViewContainer}
+                ref={el => {
+                    if (el) {
+                        this.listViewContainerEl = el;
+                    }
+                }}
+                onLayout={() => {
+                    if (this.listViewContainerEl) {
+                        this.listViewContainerEl.measure((fx, fy, width, height, px, py) => {
+                            console.log('Y offset to page: ' + py)
+                            this.listContainerPositionRelToPage.x = px;
+                            this.listContainerPositionRelToPage.y = py;
+                        })
+                    }
+                }}
+            >
                 <ListView
                     renderScrollComponent={props => <InfiniteScrollView {...props} />}
                     {...this.props}
                     dataSource={this.state.dataSource}
                     renderRow={this.renderRow}
-                    ref={el => {this.listView = el}}
+                    ref={el => {
+                        this.listView = el;
+                    }}
                     enableEmptySections={true}
                     canLoadMore={true}
                     {...this._listViewPanResponder.panHandlers}
                     onScroll={this.onListViewScroll}
                 />
+            </View>
         )
     }
     _onListViewScroll(e) {
@@ -327,9 +344,7 @@ canLoadMore={true}
             <View
                 style={{
                     flex: 1,
-                    height: item.get('dropRowContainer') ?
-                        styles.listItemCotainer.height + DROP_CONTAINER_HEIGHT :
-                        styles.listItemCotainer.height
+                    height: item.get('dropRowContainer') ? (ROW_HEIGHT + DROP_CONTAINER_HEIGHT) : ROW_HEIGHT
                 }}
                 onLayout={(e) => this._rowLayout(e, index)}
             >
@@ -339,15 +354,12 @@ canLoadMore={true}
         )
     }
     _renderActualRow(item, rowIndex) {
-        console.log(item);
+        //console.log(item);
         return (
             <TouchableHighlight
-                style={[
-                    styles.listItemCotainer,
-                    {
+                style={{
                         backgroundColor: item.get('selected') ? 'grey' : 'transparent'
-                    }
-                ]}
+                    }}
                 underlayColor={item.get('selected') ? 'grey' : 'transparent'}
                 {...this._listViewItemPanResponder.panHandlers}
             >
@@ -363,7 +375,7 @@ canLoadMore={true}
                 <View
                     style={styles.rowDropContainer}
                 >
-                    <Text>
+                    <Text style={styles.rowDropContainerText}>
                         Drop here!!
                     </Text>
                 </View>
@@ -424,14 +436,15 @@ canLoadMore={true}
         this.state.draggableHeight.setValue(DRAGGABLE_HEIGHT_DEFAULT)
         this.state.pan.setValue({
             x: 20,
-            y: touchYCoordinate
+            y: touchYCoordinate - this.listContainerPositionRelToPage.y
         })
 
     }
     _getRowIndexByY(y) {
         var rowIndex = 0;
         for (var i = 0; i < this.layoutMap.length; i++) {
-            if ((this.layoutMap[i].y <= y) && ((this.layoutMap[i].y + ROW_HEIGHT) > y)) {
+            let rowTop = this.listContainerPositionRelToPage.y + this.layoutMap[i].y;
+            if ((rowTop <= y) && ((rowTop + ROW_HEIGHT) > y)) {
                 rowIndex = i;
                 break;
             }
@@ -442,7 +455,7 @@ canLoadMore={true}
         return this.state.updatedData.filter(item => item.get('selected')).length;
     }
     _onRowPress() {
-        console.log('on row press');
+        //console.log('on row press');
     }
     _onRowLongPress(item) {
         // let selectedCount = this._getSelectedCount();
@@ -469,7 +482,7 @@ canLoadMore={true}
 }
 
 reactMixin(MultiSelectDragDropListView.prototype, timerMixin);
-
+reactMixin(MultiSelectDragDropListView.prototype, NativeMethodsMixin);
 
 const styles = StyleSheet.create({
     ...listStyle,
@@ -480,6 +493,10 @@ const styles = StyleSheet.create({
         height: DRAGGABLE_HEIGHT_DEFAULT
     },
     rowDropContainer: {
-        height: DROP_CONTAINER_HEIGHT
+        height: DROP_CONTAINER_HEIGHT,
+        backgroundColor: 'rgb(220, 260, 270)'
+    },
+    rowDropContainerText: {
+        fontSize: 18      
     }
 });

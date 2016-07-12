@@ -22,7 +22,7 @@ export default class Issue extends Component {
     render() {
         var issue = this.props.issue;
         return (
-            <View key={issue.get('id')} style={styles.listItemCotainer}>
+            <View key={issue.get('id')} style={styles.listItemContainer}>
                 <View style={styles.leftContainer}>
                     <View style={styles.topContainer}>
                         <View style={styles.topLeft}>
