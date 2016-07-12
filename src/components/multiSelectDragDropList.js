@@ -196,7 +196,7 @@ export default class MultiSelectDragDropListView extends Component {
                     if (index) {
                         this._onRowPress();
                     }
-                } else {
+                } else if (this.state.selectedRowIndex._value != -1) {
                     let dropRowContainer = _.find(this.state.updatedData,
                         item => item.get('dropRowContainer'));
                     if (dropRowContainer) {
@@ -226,7 +226,7 @@ export default class MultiSelectDragDropListView extends Component {
 
                         //reset things
                         this.state.selectedRowIndex.setValue(-1);
-                        this.state.draggableOpacity.setValue(0.6);//DRAGGABLE_OPACITY_DEFAULT
+                        this.state.draggableOpacity.setValue(DRAGGABLE_OPACITY_DEFAULT);
                         //set draggable to cover everything again
                         this.state.pan.setValue({
                             x: 0,
@@ -240,8 +240,6 @@ export default class MultiSelectDragDropListView extends Component {
                         this.state.pan.setValue(this._getDraggableDefaultPosition());
                         this.state.draggableOpacity.setValue(DRAGGABLE_OPACITY_FINAL);
                     }
-                    // if (this.state.selectedRowIndex._value != -1) {
-                    // }
                 }
             }
         })
