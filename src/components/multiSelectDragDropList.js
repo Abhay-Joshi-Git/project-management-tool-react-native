@@ -31,7 +31,7 @@ const DRAGGABLE_WIDTH_ON_APPEARANCE = 200;
 const DRAGGABLE_OPACITY_ON_APPEARANCE = 0.5;
 const DRAGGABLE_WIDTH_DEFAULT = 300;
 const DRAGGABLE_OPACITY_DEFAULT = 0;
-const DRAGGABLE_OPACITY_FINAL = 0;
+const DRAGGABLE_OPACITY_FINAL = 1;
 const ModifyData = (data) => {
     //TODO - check the data before adding these properties
     return data.map((item, index) => {
@@ -79,8 +79,8 @@ export default class MultiSelectDragDropListView extends Component {
     }
     _getDraggableDefaultPosition() {
         return {
-            x: 10,
-            y: Window.height - 60
+            x: 20,
+            y: Window.height - this.listContainerPositionRelToPage.y - 60
         };
     }
     _listViewPanResponderCreate() {
@@ -163,7 +163,6 @@ export default class MultiSelectDragDropListView extends Component {
                 });
             },
             onPanResponderStart: (e, gestureState) => {
-                //console.log('pan responder start - ', e.nativeEvent);
                 if (this.state.selectedRowIndex._value != -1) {
                     this.state.pan.setOffset({
                         x: -e.nativeEvent.locationX,
@@ -182,7 +181,6 @@ export default class MultiSelectDragDropListView extends Component {
                 }
             },
             onPanResponderRelease: (e, gestureState) => {
-                //console.log('release - ', gestureState, e.nativeEvent);
                 if (this._autoScrollingInterval) {
                     this.clearInterval(this._autoScrollingInterval);
                     this._autoScrollingInterval = null;
@@ -197,11 +195,27 @@ export default class MultiSelectDragDropListView extends Component {
                     if (index) {
                         this._onRowPress();
                     }
-                } else if (this.state.selectedRowIndex._value != -1) {
-                    //set poistion of pan near to bottom
-                    //change width, opacity
-                    this.state.pan.setValue(this._getDraggableDefaultPosition());
-                    this.state.draggableOpacity.setValue(DRAGGABLE_OPACITY_FINAL);
+                } else {
+                    let prevDropRowContainer = _.find(this.state.updatedData,
+                        item => item.get('dropRowContainer'));
+                    if (prevDropRowContainer) {
+                        let preDropIndex = prevDropRowContainer.get('index');
+                        updatedData = [
+                            ...this.state.updatedData.slice(0, preDropIndex),
+                            this.state.updatedData[preDropIndex].set('dropRowContainer', false),
+                            ...this.state.updatedData.slice(preDropIndex + 1)
+                        ];
+                        this.setState({
+                            updatedData: updatedData,
+                            dataSource: this.state.dataSource.cloneWithRows(updatedData)
+                        })
+                    }
+                    if (this.state.selectedRowIndex._value != -1) {
+                        //set poistion of pan near to bottom
+                        //change width, opacity
+                        this.state.pan.setValue(this._getDraggableDefaultPosition());
+                        this.state.draggableOpacity.setValue(DRAGGABLE_OPACITY_FINAL);
+                    }
                 }
             }
         })
@@ -313,7 +327,6 @@ export default class MultiSelectDragDropListView extends Component {
                 onLayout={() => {
                     if (this.listViewContainerEl) {
                         this.listViewContainerEl.measure((fx, fy, width, height, px, py) => {
-                            console.log('Y offset to page: ' + py)
                             this.listContainerPositionRelToPage.x = px;
                             this.listContainerPositionRelToPage.y = py;
                         })
@@ -354,7 +367,6 @@ export default class MultiSelectDragDropListView extends Component {
         )
     }
     _renderActualRow(item, rowIndex) {
-        //console.log(item);
         return (
             <TouchableHighlight
                 style={{
@@ -497,6 +509,6 @@ const styles = StyleSheet.create({
         backgroundColor: 'rgb(220, 260, 270)'
     },
     rowDropContainerText: {
-        fontSize: 18      
+        fontSize: 18
     }
 });
