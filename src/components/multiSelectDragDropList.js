@@ -58,6 +58,7 @@ export default class MultiSelectDragDropListView extends Component {
             selectedRowIndex: new Animated.Value(-1),
             draggableOpacity: new Animated.Value(DRAGGABLE_OPACITY_DEFAULT),
             draggableHeight: new Animated.Value(Window.height),
+            draggableWidth: new Animated.Value(Window.width),
             draggableTop: new Animated.Value(0)
         }
         this.layoutMap = [];
@@ -222,9 +223,17 @@ export default class MultiSelectDragDropListView extends Component {
                             updatedData: newData,
                             dataSource: this.state.dataSource.cloneWithRows(newData)
                         })
-                        this.state.selectedRowIndex.setValue(-1);
 
-                        this.state.draggableOpacity.setValue(DRAGGABLE_OPACITY_DEFAULT);
+                        //reset things
+                        this.state.selectedRowIndex.setValue(-1);
+                        this.state.draggableOpacity.setValue(0.6);//DRAGGABLE_OPACITY_DEFAULT
+                        //set draggable to cover everything again
+                        this.state.pan.setValue({
+                            x: 0,
+                            y: 0
+                        })
+                        this.state.draggableHeight.setValue(Window.height);
+                        this.state.draggableWidth.setValue(Window.width);
                     } else {
                         //set poistion of pan near to bottom
                         //change width, opacity
@@ -430,7 +439,7 @@ export default class MultiSelectDragDropListView extends Component {
                 style={[options.pan.getLayout(), styles.draggable, {
                     opacity: this.state.draggableOpacity,
                     height: this.state.draggableHeight,
-                    width: DRAGGABLE_WIDTH_ON_APPEARANCE,
+                    width: this.state.draggableWidth//DRAGGABLE_WIDTH_ON_APPEARANCE,
                 }]}
                 {...options.panResponder.panHandlers}
                  ref={(el) => {this._draggableElement = el}}
@@ -442,7 +451,8 @@ export default class MultiSelectDragDropListView extends Component {
                         this.onDraggableLongPress(touchYCoordinate);
                     }}
                     style={{
-                        height: this.state.draggableHeight._value
+                        height: this.state.draggableHeight._value,
+                        width: this.state.draggableWidth._value
                     }}
                 >
                     <View>
@@ -470,6 +480,7 @@ export default class MultiSelectDragDropListView extends Component {
         this.state.selectedRowIndex.setValue(index)
         this.state.draggableOpacity.setValue(DRAGGABLE_OPACITY_ON_APPEARANCE)
         this.state.draggableHeight.setValue(DRAGGABLE_HEIGHT_DEFAULT)
+        this.state.draggableWidth.setValue(DRAGGABLE_WIDTH_ON_APPEARANCE);
         this.state.pan.setValue({
             x: 20,
             y: touchYCoordinate - this.listContainerPositionRelToPage.y
