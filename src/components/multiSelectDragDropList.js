@@ -32,7 +32,7 @@ const DRAGGABLE_OPACITY_ON_APPEARANCE = 0.5;
 const DRAGGABLE_WIDTH_DEFAULT = 300;
 const DRAGGABLE_OPACITY_DEFAULT = 0;
 const DRAGGABLE_OPACITY_FINAL = 1;
-const ModifyData = (data) => {
+const modifyData = (data) => {
     //TODO - check the data before adding these properties
     return data.map((item, index) => {
         let newItem = item.set('index', index);
@@ -48,7 +48,7 @@ export default class MultiSelectDragDropListView extends Component {
             rowHasChanged: (r1, r2) => r1 !== r2
         }
         var ds = new ListView.DataSource(rowHasChangedFunc)
-        var updatedData = ModifyData(props.data);
+        var updatedData = modifyData(props.data);
         this.state = {
             dataSource: ds.cloneWithRows(updatedData),
             updatedData: updatedData,
@@ -196,26 +196,43 @@ export default class MultiSelectDragDropListView extends Component {
                         this._onRowPress();
                     }
                 } else {
-                    let prevDropRowContainer = _.find(this.state.updatedData,
+                    let dropRowContainer = _.find(this.state.updatedData,
                         item => item.get('dropRowContainer'));
-                    if (prevDropRowContainer) {
-                        let preDropIndex = prevDropRowContainer.get('index');
-                        updatedData = [
-                            ...this.state.updatedData.slice(0, preDropIndex),
-                            this.state.updatedData[preDropIndex].set('dropRowContainer', false),
-                            ...this.state.updatedData.slice(preDropIndex + 1)
-                        ];
-                        this.setState({
-                            updatedData: updatedData,
-                            dataSource: this.state.dataSource.cloneWithRows(updatedData)
+                    if (dropRowContainer) {
+                        let newData = [...this.state.updatedData];
+                        let selectedRows = _.remove(newData, item => item.get('selected'));
+                        selectedRows = selectedRows.map(item => item.set('selected', false));
+                        newData = newData.map((item, index) => {
+                            return item.set('index', index);
                         })
-                    }
-                    if (this.state.selectedRowIndex._value != -1) {
+                        dropRowContainer = _.find(newData,
+                            item => item.get('dropRowContainer'));
+                        let dropRowIndex = dropRowContainer.get('index');
+                        newData = [
+                            ...newData.slice(0, dropRowIndex),
+                            ...selectedRows,
+                            newData[dropRowIndex].set('dropRowContainer', false),
+                            ...newData.slice(dropRowIndex + 1)
+                        ];
+                        newData = newData.map((item, index) => {
+                            return item.set('index', index);
+                        })
+
+                        this.setState({
+                            updatedData: newData,
+                            dataSource: this.state.dataSource.cloneWithRows(newData)
+                        })
+                        this.state.selectedRowIndex.setValue(-1);
+
+                        this.state.draggableOpacity.setValue(DRAGGABLE_OPACITY_DEFAULT);
+                    } else {
                         //set poistion of pan near to bottom
                         //change width, opacity
                         this.state.pan.setValue(this._getDraggableDefaultPosition());
                         this.state.draggableOpacity.setValue(DRAGGABLE_OPACITY_FINAL);
                     }
+                    // if (this.state.selectedRowIndex._value != -1) {
+                    // }
                 }
             }
         })
@@ -295,7 +312,11 @@ export default class MultiSelectDragDropListView extends Component {
         this.onDraggableLongPress = this._onDraggableLongPress.bind(this);
     }
     componentWillReceiveProps(nextProps) {
-        var updatedData = ModifyData(nextProps.data);
+        var updatedData = modifyData(nextProps.data);
+        updatedData = [
+            ...this.state.updatedData,
+            ...updatedData.slice(this.state.updatedData.length)
+        ];
         this.setState({
             updatedData: updatedData,
             dataSource: this.state.dataSource.cloneWithRows(updatedData)
