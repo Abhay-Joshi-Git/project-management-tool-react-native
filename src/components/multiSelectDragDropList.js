@@ -395,6 +395,9 @@ export default class MultiSelectDragDropListView extends Component {
                     }}
                 underlayColor={item.get('selected') ? 'grey' : 'transparent'}
                 {...this._listViewItemPanResponder.panHandlers}
+                onLongPress={() => {
+                    this._onRowLongPress(item)
+                }}
             >
                 <View>
                     {this.props.renderRow(item)}
@@ -491,23 +494,18 @@ export default class MultiSelectDragDropListView extends Component {
         //console.log('on row press');
     }
     _onRowLongPress(item) {
-        // let selectedCount = this._getSelectedCount();
-        //
-        // itemIndex = this.state.updatedData.findIndex(dataItem => item.id == dataItem.id);
-        //
-        // updatedData = [
-        //     ...updatedData.slice(0, itemIndex),
-        //     {
-        //         ...item,
-        //         selected: !item.selected
-        //     },
-        //     ...updatedData.slice(itemIndex + 1, updatedData.length)
-        // ];
-        // this.state.selectedRowIndex.setValue(itemIndex)
-        // this.state.draggableOpacity.setValue(1)//Map[itemIndex]
-        // this.setState({
-        //     dataSource: this.state.dataSource.cloneWithRows(updatedData),
-        // });
+        let selectedCount = this._getSelectedCount();
+        let itemIndex = item.get('index');
+
+        let newData = [
+            ...this.state.updatedData.slice(0, itemIndex),
+            item.set('selected', true),
+            ...this.state.updatedData.slice(itemIndex + 1)
+        ];
+        this.setState({
+            updatedData: newData,
+            dataSource: this.state.dataSource.cloneWithRows(newData),
+        });
     }
     _onRowPressOut(item) {
         //  this.state.pan[item.index].setValue(this._getDraggableDefaultPosition());
