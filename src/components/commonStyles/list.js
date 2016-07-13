@@ -1,4 +1,20 @@
 import common from './common.js';
+import * as MK from 'react-native-material-kit';
+
+const { MKButton ,MKColor} = MK;
+
+const fab = {
+    height: 50,
+    width: 50
+}
+export const MKTheme={
+  primaryColor:MKColor.Red,
+  accentColor :MKColor.Red,
+};
+MK.setTheme(MKTheme);
+
+export const ColoredFab=MKButton.accentColoredFab()
+  .build();
 
 export default {
     ...common,
@@ -55,19 +71,78 @@ export default {
         height:1,
         backgroundColor: 'black'
     },
+    sprintContainer:{
+      flexDirection:'row',
+    },
     sprintLeft:{
-        flex:.90,
-        alignItems:'flex-start'
+      flex:.45,
+    },
+    sprintCenter:{
+      flex:.45,
+      alignItems:'flex-start',
+      justifyContent:'center',
     },
     sprintRight:{
         flex:.10,
         alignItems:'flex-start',
         justifyContent:'center'
     },
+    backlogContainer:{
+      flexDirection:'row',
+    },
+    backlogLeft:{
+      flex:.45,
+    },
+    backlogRight:{
+      flex:.55,
+      alignItems:'flex-start',
+      justifyContent:'center',
+    },
     summaryText:{
         justifyContent:'flex-end',
         fontSize:15,
         marginLeft:5,
         color:'black'
-    }
-}
+    },
+    toolbar:{
+      height:56,
+      backgroundColor:'#1fad8a',
+    },
+    iconContainer:{
+      flexDirection:'row',
+      height:60,
+      backgroundColor:'teal',
+    },
+    toolbarMenu:{
+      flex:.15,
+      justifyContent:'center',
+      marginLeft:15,
+    },
+    toolbarTitle:{
+      flex:.60,
+      justifyContent:'center',
+      alignItems:'center'
+    },
+    toolbarActions:{
+      flex:.25,
+      flexDirection:'row',
+      justifyContent:'flex-end',
+      alignItems:'center',
+      marginRight:18,
+    },
+    footerFab: {
+        position: 'absolute',
+        bottom: 48,
+        right: 27,
+        justifyContent:'center',
+        alignItems:'center',
+        ...fab
+    },
+    fab: {
+        ...fab
+    },
+    toolbarStyle:{
+      backgroundColor: '#e9eaed',
+       height: 56,
+    },
+  }
