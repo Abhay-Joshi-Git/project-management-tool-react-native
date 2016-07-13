@@ -130,31 +130,31 @@ export default class MultiSelectDragDropListView extends Component {
                 }
 
                 var scrollDown = (gestureState.moveY + DRAGGABLE_HEIGHT_DEFAULT + SCROLL_GUTTER) > Dimensions.get('window').height;
-                var scrollUp = ((gestureState.moveY - SCROLL_GUTTER) < 0) && (this.totalScrollOffset > 0);
-                if (scrollDown || scrollUp && false) {
-                    // let scrollIntensityOffset = SCROLL_OFFSET;
-                    // if (scrollDown) {
-                    //     scrollIntensityOffset =  gestureState.moveY - Dimensions.get('window').height - 10;
-                    // } else {
-                    //     scrollIntensityOffset =  gestureState.moveY - 0;
-                    // }
-                    // if (scrollIntensityOffset < SCROLL_OFFSET) {
-                    //     scrollIntensityOffset = SCROLL_OFFSET
-                    // }
-                    //
-                    // if (!this._autoScrollingInterval) {
-                    //     this._autoScrollingInterval =  this.setInterval(() => {
-                    //         this.totalScrollOffset += scrollDown ? scrollIntensityOffset : (-scrollIntensityOffset);
-                    //         this.listView.scrollTo({
-                    //             y: this.totalScrollOffset,
-                    //             animated: true
-                    //         });
-                    //         this.moveDropRowContainer(gestureState, {
-                    //             pan: this.state.pan//[item.index]
-                    //         });
-                    //     }, 20);
-                    // }
-                    // return;
+                var scrollUp = ((gestureState.moveY - this.listContainerPositionRelToPage.y - SCROLL_GUTTER) < 0) && (this.totalScrollOffset > 0);
+                if (scrollDown || scrollUp) {
+                    let scrollIntensityOffset = SCROLL_OFFSET;
+                    if (scrollDown) {
+                        scrollIntensityOffset =  gestureState.moveY - Dimensions.get('window').height - 10;
+                    } else {
+                        scrollIntensityOffset =  gestureState.moveY - 0;
+                    }
+                    if (scrollIntensityOffset < SCROLL_OFFSET) {
+                        scrollIntensityOffset = SCROLL_OFFSET
+                    }
+
+                    if (!this._autoScrollingInterval) {
+                        this._autoScrollingInterval =  this.setInterval(() => {
+                            this.totalScrollOffset += scrollDown ? scrollIntensityOffset : (-scrollIntensityOffset);
+                            this.listView.scrollTo({
+                                y: this.totalScrollOffset,
+                                animated: true
+                            });
+                            this.moveDropRowContainer(gestureState, {
+                                pan: this.state.pan//[item.index]
+                            });
+                        }, 20);
+                    }
+                    return;
                 } else if (this._autoScrollingInterval) {
                     this.clearInterval(this._autoScrollingInterval);
                     this._autoScrollingInterval = null;
@@ -253,6 +253,9 @@ export default class MultiSelectDragDropListView extends Component {
             });
         }
         let dropIndex = Math.ceil((gestureState.moveY - this.listContainerPositionRelToPage.y - ROW_DROP_ENABLE_HEIGHT + this.totalScrollOffset) / ROW_HEIGHT);
+        if ((dropIndex < 0) || (dropIndex > (this.state.updatedData.length - 1))) {
+            return;
+        }
         let prevDropRowContainer = _.find(this.state.updatedData, item => item.get('dropRowContainer'));
         var updatedData = null;
         if (!prevDropRowContainer) {
