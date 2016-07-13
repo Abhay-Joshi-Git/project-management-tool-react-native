@@ -166,7 +166,7 @@ export default class MultiSelectDragDropListView extends Component {
             onPanResponderStart: (e, gestureState) => {
                 if (this.state.selectedRowIndex._value != -1) {
                     this.state.pan.setOffset({
-                        x: -e.nativeEvent.locationX,
+                        x: 0,
                         y: -e.nativeEvent.locationY
                     });
                 } else {
@@ -197,27 +197,53 @@ export default class MultiSelectDragDropListView extends Component {
                         this._onRowPress();
                     }
                 } else if (this.state.selectedRowIndex._value != -1) {
+
+                    //optimize this, too slow on real device
+
                     let dropRowContainer = _.find(this.state.updatedData,
                         item => item.get('dropRowContainer'));
                     if (dropRowContainer) {
+                        let dropRowIndex = dropRowContainer.get('index');
                         let newData = [...this.state.updatedData];
                         let selectedRows = _.remove(newData, item => item.get('selected'));
-                        selectedRows = selectedRows.map(item => item.set('selected', false));
+
+                        if (_.find(selectedRows, item => item.get('dropRowContainer'))) {
+                            for (var i = 0; i < this.state.updatedData.length; i++) {
+                                let currRowIndex = this.state.updatedData[i].get('index');
+                                if (currRowIndex > dropRowIndex) {
+                                    if (!this.state.updatedData[i].get('selected')) {
+                                        dropRowIndex = currRowIndex;
+                                        break;
+                                    }
+                                }
+                            }
+                        }
+
+                        let dropRowId = _.find(this.state.updatedData, item => item.get('index') == dropRowIndex).get('id');
+
+                        //TODO - check necessity
                         newData = newData.map((item, index) => {
                             return item.set('index', index);
-                        })
-                        dropRowContainer = _.find(newData,
-                            item => item.get('dropRowContainer'));
-                        let dropRowIndex = dropRowContainer.get('index');
+                        });
+
+                        dropRowContainer = _.find(newData, item => item.get('id') == dropRowId);
+                        dropRowIndex = dropRowContainer.get('index');
+
+                        selectedRows = selectedRows.map((item, index) => {
+                            return item.set('selected', false)
+                                .set('dropRowContainer', false)
+                        });
+
                         newData = [
                             ...newData.slice(0, dropRowIndex),
                             ...selectedRows,
-                            newData[dropRowIndex].set('dropRowContainer', false),
+                            dropRowContainer.set('dropRowContainer', false),
                             ...newData.slice(dropRowIndex + 1)
                         ];
+
                         newData = newData.map((item, index) => {
                             return item.set('index', index);
-                        })
+                        });
 
                         this.setState({
                             updatedData: newData,
