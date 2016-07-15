@@ -204,9 +204,8 @@ export default class MultiSelectDragDropListView extends Component {
                         item => item.get('dropRowContainer'));
                     if (dropRowContainer) {
                         let dropRowIndex = dropRowContainer.get('index');
-                        let newData = [...this.state.updatedData];
-                        let selectedRows = _.remove(newData, item => item.get('selected'));
 
+                        let selectedRows = this.state.updatedData.filter(item => item.get('selected'))
                         if (_.find(selectedRows, item => item.get('dropRowContainer'))) {
                             for (var i = 0; i < this.state.updatedData.length; i++) {
                                 let currRowIndex = this.state.updatedData[i].get('index');
@@ -219,31 +218,51 @@ export default class MultiSelectDragDropListView extends Component {
                             }
                         }
 
-                        let dropRowId = _.find(this.state.updatedData, item => item.get('index') == dropRowIndex).get('id');
+                        //get min and max indices from selectedRows
+                        let minSelRowIndex = selectedRows[0].get('index');
+                        let maxSelRowIndex = selectedRows[selectedRows.length -1].get('index');
+                        let minAffectedIndex = minSelRowIndex;
+                        let maxAffectedIndex = maxSelRowIndex;
 
-                        //TODO - check necessity
-                        newData = newData.map((item, index) => {
+                        if (dropRowIndex < minSelRowIndex) {
+                            minAffectedIndex = dropRowIndex
+                        } else if (dropRowIndex > maxSelRowIndex) {
+                            maxAffectedIndex = dropRowIndex
+                        }
+
+                        let affectedData = this.state.updatedData.slice(minAffectedIndex, maxAffectedIndex + 1);
+                        affectedData = affectedData.filter(item => !item.get('selected'));
+
+                        affectedData = affectedData.map((item, index) => {
                             return item.set('index', index);
                         });
 
-                        dropRowContainer = _.find(newData, item => item.get('id') == dropRowId);
-                        dropRowIndex = dropRowContainer.get('index');
+                        //find drop row index in affectedData
+                        dropRowId = this.state.updatedData[dropRowIndex].get('id');
+                        dropRowContainerAffectedData = _.find(affectedData, item => item.get('id') == dropRowId);
+                        dropRowIndexAffectedData = dropRowContainerAffectedData.get('index');
 
                         selectedRows = selectedRows.map((item, index) => {
                             return item.set('selected', false)
                                 .set('dropRowContainer', false)
                         });
 
-                        newData = [
-                            ...newData.slice(0, dropRowIndex),
+                        affectedData = [
+                            ...affectedData.slice(0, dropRowIndexAffectedData),
                             ...selectedRows,
-                            dropRowContainer.set('dropRowContainer', false),
-                            ...newData.slice(dropRowIndex + 1)
+                            affectedData[dropRowIndexAffectedData].set('dropRowContainer', false),
+                            ...affectedData.slice(dropRowIndexAffectedData + 1)
                         ];
 
-                        newData = newData.map((item, index) => {
-                            return item.set('index', index);
+                        affectedData = affectedData.map((item, index) => {
+                            return item.set('index', index + minAffectedIndex);
                         });
+
+                        let newData = [
+                            ...this.state.updatedData.slice(0, minAffectedIndex),
+                            ...affectedData,
+                            ...this.state.updatedData.slice(maxAffectedIndex + 1)
+                        ]
 
                         this.setState({
                             updatedData: newData,
